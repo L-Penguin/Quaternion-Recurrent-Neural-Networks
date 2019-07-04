@@ -15,7 +15,6 @@ import torch.nn              as nn
 from torch.nn.parameter      import Parameter
 from torch.nn.utils.rnn      import PackedSequence
 from torch.nn                import Module
-from torch.nn._functions.rnn import Recurrent, variable_recurrent_factory
 from quaternion_ops          import *
 import math
 import sys

@@ -20,7 +20,7 @@ from recurrent_models    import QRNN, RNN, LSTM, QLSTM
 # Convert to torch.Variable 
 #
 def tovar(x):
-    return Variable(torch.FloatTensor(x).cuda())
+    return Variable(torch.FloatTensor(list(x)).cuda())
 
 def getTask(N_BATCH, SEQ_LENGTH, FEAT_SIZE, BLANK_SIZE, embedding):
     data   = []
