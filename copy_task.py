@@ -16,6 +16,9 @@ from torch.autograd      import Variable
 import numpy             as np
 from recurrent_models    import QRNN, RNN, LSTM, QLSTM
 
+# for timing
+from timeit import default_timer as timer
+
 #
 # Convert to torch.Variable 
 #
@@ -101,6 +104,9 @@ accs_r        = []
 accs_q        = []
 accs_test     = []
 
+time_r = []
+time_q = []
+
 net_r = LSTM(FEAT_SIZE, RNN_HIDDEN_SIZE, CUDA).cuda()
 net_q = QLSTM(FEAT_SIZE, QRNN_HIDDEN_SIZE, CUDA).cuda()
 
@@ -137,6 +143,8 @@ for epoch in range(EPOCHS):
     train_var        = tovar(train)
     train_target_var = tovar(train_target)
     
+    start = timer()
+
     # NN Training
     net_r.zero_grad()
     p = net_r.forward(train_var)
@@ -159,13 +167,18 @@ for epoch in range(EPOCHS):
     targets = targets.cpu().data.numpy()
     acc     = np.sum( p == targets) / (train_target.size)
 
+    end = timer()
+
     
     if (epoch % 5) == 0:
+        time_r.append(end - start)
         accs_r.append(acc)
         losses_r.append(float(val_loss.data))
     if (epoch % 10) == 0:
         string = " (NN) It : "+str(epoch)+" | Train Loss = "+str(float(val_loss.data))+" | Train Acc = "+str(acc)
         print(string)
+
+    start = timer()
 
     # QNN Training
     net_q.zero_grad()
@@ -183,8 +196,11 @@ for epoch in range(EPOCHS):
     p       = np.reshape(np.argmax(p, axis=2), shape[0]*shape[1])
     targets = targets.cpu().data.numpy()
     acc     = np.sum( p == targets) / (train_target.size)
+
+    end = timer()
     
     if (epoch % 5) == 0:
+        time_q.append(end - end)
         losses_q.append(float(val_loss.data))
         accs_q.append(acc)
     if (epoch % 10) == 0:
@@ -197,5 +213,7 @@ np.savetxt("RES/memory_task_acc_q_"+str(BLANK_SIZE)+".txt", accs_q)
 np.savetxt("RES/memory_task_acc_r_"+str(BLANK_SIZE)+".txt", accs_r)
 np.savetxt("RES/memory_task_loss_q_"+str(BLANK_SIZE)+".txt", losses_q)
 np.savetxt("RES/memory_task_loss_r_"+str(BLANK_SIZE)+".txt", losses_r)
+np.savetxt("RES/memory_task_time_q_"+str(BLANK_SIZE)+".txt", time_q)
+np.savetxt("RES/memory_task_time_r_"+str(BLANK_SIZE)+".txt", time_r)
 
 print("Done ! That's All Folks ;) !")
