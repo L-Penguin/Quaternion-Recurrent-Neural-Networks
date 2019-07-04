@@ -200,7 +200,7 @@ for epoch in range(EPOCHS):
     end = timer()
     
     if (epoch % 5) == 0:
-        time_q.append(end - end)
+        time_q.append(end - start)
         losses_q.append(float(val_loss.data))
         accs_q.append(acc)
     if (epoch % 10) == 0:
